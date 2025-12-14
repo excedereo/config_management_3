@@ -1,4 +1,8 @@
 Tets command:
 ```bash
-python asm.py test.asm program.bin --test
+python uvm_asm.py copy.asm program.bin
+```
+
+```bash
+python uvm_run.py program.bin dump.csv 195:310
 ```
