@@ -27,6 +27,12 @@ def decode(opcode: int, raw: bytes) -> dict:
         D = (code >> 26) & 0x7F
         return {"op": "LDM", "B": B, "C": C, "D": D}
 
+    if opcode == 15:  # GE: B(4..10), C(11..20), D(21..27)
+        B = (code >> 4) & 0x7F
+        C = (code >> 11) & 0x3FF
+        D = (code >> 21) & 0x7F
+        return {"op": "GE", "B": B, "C": C, "D": D}
+
     return {"op": "UNKNOWN", "A": opcode}
 
 def run_program(mem: list[int], prog_len: int) -> None:
@@ -54,8 +60,12 @@ def run_program(mem: list[int], prog_len: int) -> None:
                 raise ValueError(f"Выход за память: {addr}")
             regs[ins["C"]] = mem[addr]
 
+        elif ins["op"] == "GE":
+            # rD = (rB >= MEM[C]) ? 1 : 0
+            regs[ins["D"]] = 1 if regs[ins["B"]] >= mem[ins["C"]] else 0
+
         else:
-            raise NotImplementedError(f"Команда A={opcode} не реализована на этапе 3")
+            raise NotImplementedError(f"Команда A={opcode} не реализована")
 
         pc += size
 
